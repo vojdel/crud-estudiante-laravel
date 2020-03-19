@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Estudiante;
 use Illuminate\Http\Request;
+use Redirect;
 
 class EstudianteController extends Controller
 {
@@ -13,7 +15,8 @@ class EstudianteController extends Controller
      */
     public function index()
     {
-        //
+        $data['estudiantes'] = Estudiante::orderBy('id', 'asc')->paginate(5);
+        return view('estudiante.index', $data);
     }
 
     /**
@@ -23,7 +26,7 @@ class EstudianteController extends Controller
      */
     public function create()
     {
-        //
+        return view('estudiante.create');
     }
 
     /**
@@ -34,7 +37,17 @@ class EstudianteController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nombres' => 'required',
+            'apellidos' => 'required',
+            'genero' => 'required',
+            'fechaDeNacimiento' => 'required',
+            'direccion' => 'required'
+        ]);
+
+        Estudiante::create($request->all());
+
+        return redirect()->route('estudiante.index')->with('success', 'Estudiante Registrado Satisfactoriamente.');
     }
 
     /**
@@ -56,7 +69,10 @@ class EstudianteController extends Controller
      */
     public function edit($id)
     {
-        //
+        $where = array('id' => $id);
+        $data['estudiante_info'] = Estudiante::where($where)->first();
+        
+        return view('estudiante.edit', $data);
     }
 
     /**
@@ -68,7 +84,26 @@ class EstudianteController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'nombres' => 'required',
+            'apellidos' => 'required',
+            'genero' => 'required',
+            'fechaDeNacimiento' => 'required',
+            'direccion' => 'required'
+        ]);
+        
+        $update = [
+        	'nombres' => $request->nombres,
+        	'apellidos' => $request->apellidos,
+        	'genero' => $request->genero,
+        	'fechaDeNacimiento' => $request->fechaDeNacimiento,
+        	'direccion' => $request->direccion
+        ];
+        
+        Estudiante::where('id', $id)->update($update);
+        
+        return Redirect::to('estudiante')->with('success', 'Estudiante actualizado satisfactoriamente.');
+
     }
 
     /**
