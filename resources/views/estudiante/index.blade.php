@@ -42,7 +42,9 @@
                              class="btn btn-primary"> <span class="fa fa-edit" title="Editar"></span></a>
                         </td>
                         <td>
-                            <form action="#" method="post">
+                            <form action="{{ route('estudiante.destroy',  $estudiante->id) }}" method="post">
+                                {{ csrf_field() }}
+                                @method('DELETE')
                                 <button class="btn btn-danger" type="submit"> <span class="fa fa-trash" title="Eliminar"></span></button>
                             </form>
                         </td>

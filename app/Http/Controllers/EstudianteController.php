@@ -114,6 +114,8 @@ class EstudianteController extends Controller
      */
     public function destroy($id)
     {
-        //
+        Estudiante::where('id', $id)->delete();
+
+        return Redirect::to('estudiante')->with('success', 'Estudiante eliminado satisfactoriamente.');
     }
 }
