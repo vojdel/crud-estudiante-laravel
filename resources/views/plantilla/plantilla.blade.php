@@ -14,6 +14,10 @@
 </head>
 <body> 
 
+    @yield('encabezado')
+
+        <hr>
+
     @yield('contenido')
 
 </body>
