@@ -14,6 +14,8 @@
 </head>
 <body> 
 
+    @include('plantilla.nav')
+
     @yield('encabezado')
 
         <hr>
