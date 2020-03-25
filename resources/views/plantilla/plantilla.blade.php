@@ -12,15 +12,26 @@
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
 </head>
-<body> 
+<body class="vw-100 vh-100 bg-dark"> 
 
     @include('plantilla.nav')
 
-    @yield('encabezado')
+    <div class="container pt-5 justify-content-center">
 
-        <hr>
+    <div class="card">
+        <div class="card-body">        
+            
+            @yield('encabezado')
 
-    @yield('contenido')
+            <hr>
+
+            @yield('contenido')
+        
+        </div>
+    </div>
+
+    </div>
+
 
 </body>
 </html>

@@ -4,7 +4,7 @@
 
 @section('encabezado')
 
-<h2>Registrar Estudiante</h2>
+<h2 class="card-title">Registrar Estudiante</h2>
 
 @endsection
 

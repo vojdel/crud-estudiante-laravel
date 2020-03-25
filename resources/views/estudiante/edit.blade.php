@@ -4,13 +4,12 @@
 
 @section('encabezado')
 
-<h2>Editar Estudiante</h2>
+<h2 class="card-title">Editar Estudiante</h2>
 
 @endsection
 
 @section('contenido')
 
-<div class="container pt-5 justify-content-center">
         <form action="{{route('estudiante.update', $estudiante_info->id)}}" method="post" name="add_etudiante">
         {{ csrf_field() }}
         @method('PATCH')
@@ -57,7 +56,6 @@
                 </div>
             </div>
         </form>
-    </div>
 
 
 @endsection

@@ -1,6 +1,12 @@
-@section('titulo', 'Estudiante - Indice')
+@section('titulo', 'Estudiante - Lista')
 
 @extends('plantilla.plantilla')
+
+@section('encabezado')
+
+<h2 class="card-title">Lista de Estudiantes</h2>
+
+@endsection
 
 @section('contenido')
 
