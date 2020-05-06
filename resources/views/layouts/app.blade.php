@@ -19,7 +19,7 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 </head>
-<body>
+<body class="vw-100 vh-100 bg-dark">
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
@@ -76,5 +76,14 @@
             @yield('content')
         </main>
     </div>
+
+    <script>
+    window.addEventListener('load', function() {
+        $('#myModal').on('shown.bs.modal', function () {
+      $('#myInput').trigger('focus')
+    })
+    });
+
+    </script>
 </body>
 </html>

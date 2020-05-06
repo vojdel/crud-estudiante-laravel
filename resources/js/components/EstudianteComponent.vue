@@ -62,13 +62,18 @@ cd<template>
                     <nav aria-label="Page navigation example">
                         <ul class="pagination justify-content-center">
                             <li class="page-item disabled">
-                            <a class="page-link" href="#" tabindex="-1">Previous</a>
+                            <a class="page-link" href="#" tabindex="-1"
+                            @click.preventDefault="paginacion(this.pagina, 'previo')">Previous</a>
                             </li>
-                            <li class="page-item"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item"><a class="page-link" href="#"
+                              @click.preventDefault="paginacion(1, 'normal')">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#"
+                              @click.preventDefault="paginacion(2, 'normal')">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#"
+                              @click.preventDefault="paginacion(3, 'normal')">3</a></li>
                             <li class="page-item">
-                            <a class="page-link" href="#">Next</a>
+                            <a class="page-link" href="#"
+                            @click.preventDefault="paginacion(this.pagina, 'siguiente')">Next</a>
                             </li>
                         </ul>
                     </nav>
@@ -161,16 +166,26 @@ export default {
             editar: false,
             tituloModal: 'Registrar Estudiante',
             botonModal: 'Agregar',
-            headers: {
-                       'Content-Type': 'application/json'
-                },
-                estado: 'loading'
+            pagina: 1,
+            vista: 5,
+            estado: 'loading',
+            total: 0
         }
     },
     methods: {
-    	paginacion(){
+    	paginacion(pag, tipo){
 
-    		axios.get('/estudiante')
+        if(tipo == 'previo'){
+          this.pagina = pag-1;
+        } else if (tipo == 'siguiente') {
+          this.pagina = pag+1;
+        } else if (tipo == 'normal') {
+          this.pagina = pag;
+        }
+
+          this.estado = 'loading';
+
+    		axios.get(`/estudiante/${this.pagina}/${this.vista}`)
                 .then(respuesta => {
                     console.log(respuesta);
                     console.log(respuesta.data);
@@ -202,7 +217,7 @@ export default {
                   .then(respuesta =>{
                     console.log(respuesta);
                     this.limpiar();
-                    this.paginacion();
+                    this.paginacion(this.pagina, 'normal');
                   })
                   .catch(error => {
                     console.log(error);
@@ -229,12 +244,12 @@ export default {
                     direccion: this.estudiante.direccion
                   };
 
-                  console.log(this.estudiante);
+                  console.log(this.estudiante.id);
           axios.put(`/estudiante/${this.estudiante.id}`, params)
             .then(respuesta => {
               console.log(respuesta);
               this.limpiar();
-              this.paginacion();
+              this.paginacion(this.pagina, 'normal');
 
             })
             .catch(error =>{
@@ -246,7 +261,7 @@ export default {
           axios.delete(`/estudiante/${id}`)
             .then(respuesta => {
               console.log(respuesta);
-              this.paginacion();
+              this.paginacion(this.pagina, 'normal');
             })
             .catch(error => {
               alert(error);
@@ -267,7 +282,7 @@ export default {
         }
     },
     created(){
-        this.paginacion();
+        this.paginacion(this.pagina, 'normal');
         //llamados.paginacion('/estudiante', estudiantes);
     },
 }

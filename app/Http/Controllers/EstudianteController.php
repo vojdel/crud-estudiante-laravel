@@ -16,16 +16,15 @@ class EstudianteController extends Controller
      *@param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(Request $request, $pag, $vista)
     {
-        //$data['estudiantes'] = Estudiante::orderBy('id', 'asc')->paginate(5);
-        //return view('estudiante.index', $data);
         if($request->ajax()){
 
             $data = Estudiante::select('estudiantes.id', 'personas.nombres', 'personas.apellidos', 'personas.genero', 'personas.fechaDeNacimiento', 'personas.direccion')
                 ->join('personas', 'estudiantes.id_persona', '=', 'personas.id')
-                ->skip(0)
-                ->take(5)
+                ->orderBy('estudiantes.id', 'DESC')
+                ->skip(($pag * $vista) - $vista)
+                ->take($vista)
                 ->get();
                 /* skip() para saltar entre la consulta
                 *   take() para limitar el resultado
@@ -71,7 +70,7 @@ class EstudianteController extends Controller
 
         $estudiante = new Estudiante();
         $estudiante->id_persona = $persona->id;
-        $estudiante->id_users = 1;
+        $estudiante->id_users = auth()->id();
         $estudiante->save();
 
         return $estudiante;
@@ -134,7 +133,9 @@ class EstudianteController extends Controller
         	'direccion' => $request->direccion
         ];
 
-        return Persona::where('id', $id)->update($update);
+        $persona = Persona::where('id', $id)->update($update);
+
+        return $persona;
 
     }
 

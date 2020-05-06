@@ -12,21 +12,22 @@
 */
 
 Route::get('/', function () {
-    return redirect('/home');
-    //return view('welcome');
+    return view('welcome');
  });
 
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
+Route::get("/estudiante/{pagina}/{vista}", "EstudianteController@index");
+
 Route::resource("/estudiante", "EstudianteController")->except([
   'create', 'show', 'edit'
-]);
+])->middleware('auth');
 
 Route::resource("/representante", "RepresentanteController")->except([
   'create', 'show', 'edit'
-]);
+])->middleware('auth');
 
 Route::get('/prueba', function(){
     return view('prueba');
