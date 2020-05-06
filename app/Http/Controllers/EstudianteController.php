@@ -13,7 +13,8 @@ class EstudianteController extends Controller
     /**
      * Display a listing of the resource.
      *
-     *@param  int  $id
+     *@param  int  $pag
+     *@param  int  $vista
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request, $pag, $vista)
@@ -26,6 +27,25 @@ class EstudianteController extends Controller
                 ->skip(($pag * $vista) - $vista)
                 ->take($vista)
                 ->get();
+                /* skip() para saltar entre la consulta
+                *   take() para limitar el resultado
+                */
+
+                return $data;
+        }
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function contar(Request $request)
+    {
+        if($request->ajax()){
+
+            $data = Estudiante::all()
+                ->count();
                 /* skip() para saltar entre la consulta
                 *   take() para limitar el resultado
                 */

@@ -63,17 +63,15 @@ cd<template>
                         <ul class="pagination justify-content-center">
                             <li class="page-item disabled">
                             <a class="page-link" href="#" tabindex="-1"
-                            @click.preventDefault="paginacion(this.pagina, 'previo')">Previous</a>
+                            @click.preventDefault="paginacion(pagina, 'previo')">Previous</a>
                             </li>
-                            <li class="page-item"><a class="page-link" href="#"
-                              @click.preventDefault="paginacion(1, 'normal')">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#"
-                              @click.preventDefault="paginacion(2, 'normal')">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#"
-                              @click.preventDefault="paginacion(3, 'normal')">3</a></li>
+                            <template v-for="n in count">
+                              <li class="page-item"><a class="page-link" href="#"
+                                @click.preventDefault="paginacion(n + 1, 'normal')">{{(n+1)}}</a></li>
+                            </template>
                             <li class="page-item">
                             <a class="page-link" href="#"
-                            @click.preventDefault="paginacion(this.pagina, 'siguiente')">Next</a>
+                            @click.preventDefault="paginacion(pagina, 'siguiente')">Next</a>
                             </li>
                         </ul>
                     </nav>
@@ -169,7 +167,9 @@ export default {
             pagina: 1,
             vista: 5,
             estado: 'loading',
-            total: 0
+            count: [],
+            total: 0,
+            paginas: 0
         }
     },
     methods: {
@@ -193,6 +193,7 @@ export default {
                       this.estado = '';
                       this.estudiantes = respuesta.data;
                     }, 5000);
+                    this.contar();
                 })
                 .catch(error => {
                 	alert(error);
@@ -279,6 +280,19 @@ export default {
             this.tituloModal = 'Registrar Estudiante';
             this.botonModal = 'Registrar';
           }, 500);
+        },
+        contar(){
+          axios.get(`/estudiante/contar`)
+                  .then(respuesta => {
+                    this.count = [];
+                      for (var i = 0; i < (respuesta.data / this.vista); i++) {
+                        this.count.push(i);
+                      }
+                      this.total = respuesta.data;
+                  })
+                  .catch(error => {
+                    alert(error);
+                  })
         }
     },
     created(){

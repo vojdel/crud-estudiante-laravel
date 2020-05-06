@@ -21,6 +21,8 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 Route::get("/estudiante/{pagina}/{vista}", "EstudianteController@index");
 
+Route::get("/estudiante/contar", "EstudianteController@contar");
+
 Route::resource("/estudiante", "EstudianteController")->except([
   'create', 'show', 'edit'
 ])->middleware('auth');
