@@ -16,22 +16,22 @@
 
     @include('plantilla.nav')
 
-    <div class="container pt-5 justify-content-center">
-
-    <div class="card">
-        <div class="card-body">        
+    <div id="app">     
             
-            @yield('encabezado')
-
-            <hr>
-
             @yield('contenido')
-        
-        </div>
-    </div>
 
     </div>
 
+    </div>
+
+<script>
+window.addEventListener('load', function() {
+    $('#myModal').on('shown.bs.modal', function () {
+  $('#myInput').trigger('focus')
+})
+});
+    
+</script>
 
 </body>
 </html>

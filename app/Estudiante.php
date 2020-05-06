@@ -6,11 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Estudiante extends Model
 {
-    protected $fillable = [
-        "nombres",
-        "apellidos",
-        "genero",
-        "fechaDeNacimiento",
-        "direccion"
-    ];
+    public function persona(){
+      return $this->belongTo(Persona::class);
+    }
 }

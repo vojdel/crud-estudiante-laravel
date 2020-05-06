@@ -12,12 +12,22 @@
 */
 
 Route::get('/', function () {
-    return redirect('/estudiante');
-/*     return view('welcome');
- */});
+    return redirect('/home');
+    //return view('welcome');
+ });
 
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
-Route::resource("estudiante", "EstudianteController");
+Route::resource("/estudiante", "EstudianteController")->except([
+  'create', 'show', 'edit'
+]);
+
+Route::resource("/representante", "RepresentanteController")->except([
+  'create', 'show', 'edit'
+]);
+
+Route::get('/prueba', function(){
+    return view('prueba');
+});

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Estudiante;
+use App\Persona;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Redirect;
 
 class EstudianteController extends Controller
@@ -11,12 +13,26 @@ class EstudianteController extends Controller
     /**
      * Display a listing of the resource.
      *
+     *@param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data['estudiantes'] = Estudiante::orderBy('id', 'asc')->paginate(5);
-        return view('estudiante.index', $data);
+        //$data['estudiantes'] = Estudiante::orderBy('id', 'asc')->paginate(5);
+        //return view('estudiante.index', $data);
+        if($request->ajax()){
+
+            $data = Estudiante::select('estudiantes.id', 'personas.nombres', 'personas.apellidos', 'personas.genero', 'personas.fechaDeNacimiento', 'personas.direccion')
+                ->join('personas', 'estudiantes.id_persona', '=', 'personas.id')
+                ->skip(0)
+                ->take(5)
+                ->get();
+                /* skip() para saltar entre la consulta
+                *   take() para limitar el resultado
+                */
+
+                return $data;
+        }
     }
 
     /**
@@ -37,7 +53,7 @@ class EstudianteController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+         $request->validate([
             'nombres' => 'required',
             'apellidos' => 'required',
             'genero' => 'required',
@@ -45,9 +61,30 @@ class EstudianteController extends Controller
             'direccion' => 'required'
         ]);
 
-        Estudiante::create($request->all());
+        $persona = new Persona();
+        $persona->nombres = $request->nombres;
+        $persona->apellidos = $request->apellidos;
+        $persona->genero = $request->genero;
+        $persona->fechaDeNacimiento = $request->fechaDeNacimiento;
+        $persona->direccion = $request->direccion;
+        $persona->save();
 
-        return redirect()->route('estudiante.index')->with('success', 'Estudiante Registrado Satisfactoriamente.');
+        $estudiante = new Estudiante();
+        $estudiante->id_persona = $persona->id;
+        $estudiante->id_users = 1;
+        $estudiante->save();
+
+        return $estudiante;
+
+        /*$estudiante = new Estudiante();
+        $estudiante->nombres = $request->nombres;
+        $estudiante->apellidos = $request->apellidos;
+        $estudiante->genero = $request->genero;
+        $estudiante->fechaDeNacimiento = $request->fechaDeNacimiento;
+        $estudiante->direccion = $request->direccion;
+        $estudiante->save();
+
+        return $estudiante;*/
     }
 
     /**
@@ -69,10 +106,7 @@ class EstudianteController extends Controller
      */
     public function edit($id)
     {
-        $where = array('id' => $id);
-        $data['estudiante_info'] = Estudiante::where($where)->first();
-        
-        return view('estudiante.edit', $data);
+        //
     }
 
     /**
@@ -91,7 +125,7 @@ class EstudianteController extends Controller
             'fechaDeNacimiento' => 'required',
             'direccion' => 'required'
         ]);
-        
+
         $update = [
         	'nombres' => $request->nombres,
         	'apellidos' => $request->apellidos,
@@ -99,10 +133,8 @@ class EstudianteController extends Controller
         	'fechaDeNacimiento' => $request->fechaDeNacimiento,
         	'direccion' => $request->direccion
         ];
-        
-        Estudiante::where('id', $id)->update($update);
-        
-        return Redirect::to('estudiante')->with('success', 'Estudiante actualizado satisfactoriamente.');
+
+        return Persona::where('id', $id)->update($update);
 
     }
 
@@ -114,8 +146,7 @@ class EstudianteController extends Controller
      */
     public function destroy($id)
     {
-        Estudiante::where('id', $id)->delete();
-
-        return Redirect::to('estudiante')->with('success', 'Estudiante eliminado satisfactoriamente.');
+        $persona = Persona::where('id', $id)->delete();
+        return $persona;
     }
 }
