@@ -133,11 +133,17 @@ cd<template>
                 <form>
                   <div class="form-group">
                     <label for="nombres">Nombre(s): </label>
-                    <input type="text" id="nombres" class="form-control" v-model="estudiante.nombres">
+                    <input type="text" id="nombres" class="form-control" name="nombres"
+                    v-model="estudiante.nombres"
+                    v-validate="'required|min:3|alpha_spaces'">
+                    <span class="text-danger">{{ errors.first('nombres') }}</span>
                   </div>
                   <div class="form-group">
                     <label for="apellidos">Apellido(s): </label>
-                    <input type="text" id="apellidos" class="form-control" v-model="estudiante.apellidos">
+                    <input type="text" id="apellidos" class="form-control" name="apellidos"
+                    v-model="estudiante.apellidos"
+                    v-validate="'required|min:3|alpha_spaces'">
+                    <span class="text-danger">{{ errors.first('apellidos') }}</span>
                   </div>
                   <div class="form-group">
                     <div class="form-check">
@@ -158,12 +164,17 @@ cd<template>
                   <div class="form-group">
                     <label for="fechaDeNacimiento">Fecha de Nacimiento: </label>
                     <input type="date" id="fechaDeNacimiento" class="form-control"
-                    v-model="estudiante.fechaDeNacimiento">
+                    name="fechaDeNacimiento"
+                    v-model="estudiante.fechaDeNacimiento"
+                    v-validate="'required|date_between:2008-01-01,2020-12-31'">
+                    <span class="text-danger">{{ errors.first('fechaDeNacimiento') }}</span>
                   </div>
                   <div class="form-group">
                     <label for="direccion">Dirección: </label>
-                    <input type="text" id="direccion" class="form-control"
-                    v-model="estudiante.direccion">
+                    <textarea type="text" id="direccion" class="form-control" name="direccion" rows="2" cols="2"
+                    v-model="estudiante.direccion"
+                    v-validate="'required|max:150'"></textarea>
+                    <span class="text-danger">{{ errors.first('direccion') }}</span>
                   </div>
               </form>
             </div>
