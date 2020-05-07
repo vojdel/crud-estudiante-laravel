@@ -19,7 +19,7 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
-Route::get("/estudiante/{pagina}/{vista}", "EstudianteController@index");
+Route::get("/estudiante/{pagina}/{vista}/{orden}/{tipo}", "EstudianteController@index");
 
 Route::get("/estudiante/contar", "EstudianteController@contar");
 

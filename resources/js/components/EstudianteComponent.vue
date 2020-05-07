@@ -15,12 +15,18 @@ cd<template>
                     <table class="table table-bordered" id="laravel-crud">
                         <thead class="bg-dark text-light">
                             <tr>
-                                <th>ID</th>
-                                <th>Nombres</th>
-                                <th>Apellidos</th>
-                                <th>Genero</th>
-                                <th>Fecha de Nacimiento</th>
-                                <th>Dirección</th>
+                                <th
+                                @click="paginacion(pagina, 'normal', 'id')">ID</th>
+                                <th
+                                @click="paginacion(pagina, 'normal', 'nombres')">Nombres</th>
+                                <th
+                                @click="paginacion(pagina, 'normal', 'apellidos')">Apellidos</th>
+                                <th
+                                @click="paginacion(pagina, 'normal', 'genero')">Genero</th>
+                                <th
+                                @click="paginacion(pagina, 'normal', 'fechaDeNacimiento')">Fecha de Nacimiento</th>
+                                <th
+                                @click="paginacion(pagina, 'normal', 'direccion')">Dirección</th>
                                 <th colspan="2">Acción</th>
                             </tr>
                         </thead>
@@ -61,17 +67,49 @@ cd<template>
                     </table>
                     <nav aria-label="Page navigation example">
                         <ul class="pagination justify-content-center">
-                            <li class="page-item disabled">
+                            <li class="page-item disabled"
+                            v-if="pagina == 1">
                             <a class="page-link" href="#" tabindex="-1"
-                            @click.preventDefault="paginacion(pagina, 'previo')">Previous</a>
+                            @click.prevent="paginacion(1, 'normal', orden)">First</a>
+                            </li>
+                            <li class="page-item"
+                            v-else>
+                            <a class="page-link" href="#" tabindex="-1"
+                            @click.prevent="paginacion(1, 'normal', orden)">First</a>
+                            </li>
+                            <li class="page-item disabled"
+                            v-if="pagina == 1">
+                            <a class="page-link" href="#" tabindex="-1"
+                            @click.prevent="paginacion(pagina, 'previo', orden)">Previous</a>
+                            </li>
+                            <li class="page-item"
+                            v-else>
+                            <a class="page-link" href="#" tabindex="-1"
+                            @click.prevent="paginacion(pagina, 'previo', orden)">Previous</a>
                             </li>
                             <template v-for="n in count">
                               <li class="page-item"><a class="page-link" href="#"
-                                @click.preventDefault="paginacion(n + 1, 'normal')">{{(n+1)}}</a></li>
+                                v-if="(n - 5) < pagina && pagina < (n+5)"
+                                @click.prevent="paginacion(n + 1, 'normal', orden)">{{(n+1)}}</a></li>
                             </template>
-                            <li class="page-item">
+                            <li class="page-item"
+                            v-if="pagina !== (count.length)">
                             <a class="page-link" href="#"
-                            @click.preventDefault="paginacion(pagina, 'siguiente')">Next</a>
+                            @click.prevent="paginacion(pagina, 'siguiente', orden)">Next</a>
+                            </li>
+                            <li class="page-item disabled"
+                            v-else>
+                            <a class="page-link" href="#"
+                            @click.prevent="paginacion(pagina, 'siguiente', orden)">Next</a>
+                            <li class="page-item"
+                            v-if="pagina !== (count.length)">
+                            <a class="page-link" href="#"
+                            @click.prevent="paginacion(count[count.length-1], 'siguiente', orden)">last</a>
+                            </li>
+                            <li class="page-item disabled"
+                            v-else>
+                            <a class="page-link" href="#"
+                            @click.prevent="paginacion(count[count.length-1], 'siguiente', orden)">last</a>
                             </li>
                         </ul>
                     </nav>
@@ -160,7 +198,6 @@ export default {
                 fechaDeNacimiento: '',
                 direccion: ''
             },
-            p : 0,
             editar: false,
             tituloModal: 'Registrar Estudiante',
             botonModal: 'Agregar',
@@ -169,11 +206,13 @@ export default {
             estado: 'loading',
             count: [],
             total: 0,
-            paginas: 0
+            paginas: 0,
+            orden: 'id',
+            ascDesc: false
         }
     },
     methods: {
-    	paginacion(pag, tipo){
+    	paginacion(pag, tipo, orderBy){
 
         if(tipo == 'previo'){
           this.pagina = pag-1;
@@ -183,9 +222,16 @@ export default {
           this.pagina = pag;
         }
 
-          this.estado = 'loading';
+        if(this.ascDesc == false){
+          this.ascDesc = true;
+        }else{
+          this.ascDesc = false;
+        }
 
-    		axios.get(`/estudiante/${this.pagina}/${this.vista}`)
+          this.estado = 'loading';
+          this.orden = orderBy;
+
+    		axios.get(`/estudiante/${this.pagina}/${this.vista}/${orderBy}/${(this.ascDesc)? 'ASC' : 'DESC' }`)
                 .then(respuesta => {
                     console.log(respuesta);
                     console.log(respuesta.data);
@@ -218,7 +264,7 @@ export default {
                   .then(respuesta =>{
                     console.log(respuesta);
                     this.limpiar();
-                    this.paginacion(this.pagina, 'normal');
+                    this.paginacion(this.pagina, 'normal', this.orden);
                   })
                   .catch(error => {
                     console.log(error);
@@ -250,7 +296,7 @@ export default {
             .then(respuesta => {
               console.log(respuesta);
               this.limpiar();
-              this.paginacion(this.pagina, 'normal');
+              this.paginacion(this.pagina, 'normal', this.orden);
 
             })
             .catch(error =>{
@@ -262,7 +308,7 @@ export default {
           axios.delete(`/estudiante/${id}`)
             .then(respuesta => {
               console.log(respuesta);
-              this.paginacion(this.pagina, 'normal');
+              this.paginacion(this.pagina, 'normal', this.orden);
             })
             .catch(error => {
               alert(error);
@@ -296,7 +342,7 @@ export default {
         }
     },
     created(){
-        this.paginacion(this.pagina, 'normal');
+        this.paginacion(this.pagina, 'normal', this.orden);
         //llamados.paginacion('/estudiante', estudiantes);
     },
 }

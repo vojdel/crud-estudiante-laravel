@@ -17,13 +17,19 @@ class EstudianteController extends Controller
      *@param  int  $vista
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, $pag, $vista)
+    public function index(Request $request, $pag, $vista, $orden, $tipo)
     {
         if($request->ajax()){
 
+          $ordenBy = 'estudiantes.'.$orden;
+
+          if($orden !== 'id'){
+            $ordenBy = 'personas.'.$orden;
+          }
+
             $data = Estudiante::select('estudiantes.id', 'personas.nombres', 'personas.apellidos', 'personas.genero', 'personas.fechaDeNacimiento', 'personas.direccion')
                 ->join('personas', 'estudiantes.id_persona', '=', 'personas.id')
-                ->orderBy('estudiantes.id', 'DESC')
+                ->orderBy($ordenBy, $tipo)
                 ->skip(($pag * $vista) - $vista)
                 ->take($vista)
                 ->get();
