@@ -40,6 +40,37 @@ class EstudianteController extends Controller
                 return $data;
         }
     }
+    
+    /**
+     * Display a listing of the resource.
+     *
+     *@param  int  $buscar
+     *@param  int  $pag
+     *@param  int  $vista
+     * @return \Illuminate\Http\Response
+     */
+    public function search(Request $request, $buscar)
+    {
+        if($request->ajax()){
+
+          $ordenBy = 'estudiantes.'.$orden;
+
+          if($orden !== 'id'){
+            $ordenBy = 'personas.'.$orden;
+          }
+
+            $data = Estudiante::select('estudiantes.id', 'personas.nombres', 'personas.apellidos', 'personas.genero', 'personas.fechaDeNacimiento', 'personas.direccion')
+                ->join('personas', 'estudiantes.id_persona', '=', 'personas.id')
+                ->where('personas.nombres', '=', '%'.$buscar.'%')
+                ->orderBy('estudiantes.id', 'DESC')
+                ->get();
+                /* skip() para saltar entre la consulta
+                *   take() para limitar el resultado
+                */
+
+                return $data;
+        }
+    }
 
     /**
      * Display a listing of the resource.

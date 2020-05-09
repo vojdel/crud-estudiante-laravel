@@ -1,54 +1,33 @@
-import axios from 'axios';
+import Vue from 'vue'
+import axios from 'axios'
 
-export const llamados = {
-
-    paginacion(url, arreglo){
-      axios.get(url)
-              .then(respuesta => {
-              console.log(respuesta);
-              console.log(respuesta.data);
-                  arreglo = respuesta.data;
-              })
-              .catch(error => {
-                console.log(error);
-              })
-    },
-    agregar(url, params){
-      axios({
-      method: 'post',
-      url: url,
-      data: params
-      })
-            .then(respuesta =>{
-              console.log(respuesta);
-              callback();  // hace una llamado a la funcion que mandes, ej: limpiar()
-              this.paginacion();
-            })
-            .catch(error => {
-              console.log(error);
-            })
-    },
-    editar(url, id, params, callback){
-      axios.put(`${url}/${id}`, params)
-        .then(respuesta => {
-          console.log(respuesta);
-          callback();
-          this.paginacion();
-
-        })
-        .catch(error =>{
-          console.log(error);
-        })
-    },
-    eliminar(url, id){
-      axios.delete(`${url}/${id}`)
-        .then(respuesta => {
-          //console.log(respuesta);
-          this.paginacion();
-        })
-        .catch(error => {
-          alert(error);
-        })
-    }
-
-}
+export const llamados = new Vue({
+	methods: {
+			paginacion(data,pag, tipo, orderBy, estado){
+	
+	        if(tipo == 'previo'){
+	          pag = pag-1;
+	        } else if (tipo == 'siguiente') {
+	          pag = pag+1;
+	        } else if (tipo == 'normal') {
+	          pag = pag;
+	        }
+	        
+	    		axios.get(`/estudiante/${pag}/${vista}/id/DESC`)
+	                .then(respuesta => {
+	                    console.log(respuesta);
+	                    console.log(respuesta.data);
+	                    setTimeout(()=>{
+	                      estado = '';
+	                      let datos = respuesta.data;
+	                      this.$emit('actualizarDatos', datos);
+	                      
+	                    }, 5000);
+	                    this.contar();
+	                })
+	                .catch(error => {
+	                	alert(error);
+	                })
+        }
+	}
+});

@@ -31,6 +31,4 @@ Route::resource("/representante", "RepresentanteController")->except([
   'create', 'show', 'edit'
 ])->middleware('auth');
 
-Route::get('/prueba', function(){
-    return view('prueba');
-});
+Route::get("/estudiante/search/{buscar}/{pagina}/{vista}/{orden}/{tipo}", "EstudianteController@search");

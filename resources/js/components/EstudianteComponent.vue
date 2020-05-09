@@ -2,8 +2,15 @@ cd<template>
      <div>
          <div class="container pt-5 card">
             <div class="row">
-                <div class="col-10">
+                <div class="col">
                     <h2 class="card-title">Lista de Estudiantes:</h2>
+                </div>
+                <div class="col-10">
+                    <div class="form-group">
+                    	<input type="text" name="busqueda" class="form-control" 
+                    	@keyup.enter="buscar()"
+                    	v-model="busqueda" />
+                    </div>
                 </div>
                 <div class="col-2 pr-3">
                     <a href="#"
@@ -65,7 +72,8 @@ cd<template>
                         </template>
                         </tbody>
                     </table>
-                    <nav aria-label="Page navigation example">
+                    <template v-if="count.length != 1">
+                    	<nav aria-label="Page navigation example">
                         <ul class="pagination justify-content-center">
                             <li class="page-item disabled"
                             v-if="pagina == 1">
@@ -113,6 +121,7 @@ cd<template>
                             </li>
                         </ul>
                     </nav>
+                    </template>
                 </div>
             </div>
         </div>
@@ -147,7 +156,7 @@ cd<template>
                   </div>
                   <div class="form-group">
                     <div class="form-check">
-                      <input class="form-check-input" type="radio" name="genero" id="hombre" value="hombre" checked
+                      <input class="form-check-input" type="radio" name="genero" id="hombre" value="hombre" checked=""
                       v-model="estudiante.genero">
                       <label class="form-check-label" for="hombre">
                         Hombre
@@ -183,10 +192,14 @@ cd<template>
                  @click="limpiar">Close</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal"
                 v-if="!editar"
-                @click="agregarEstudiante()">{{ botonModal }}</button>
+                @click="agregarEstudiante()"
+                :disabled='errors.any() || isComplete'>
+                	<span class="fa fa-save"></span> {{ botonModal }}
+                </button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal"
                 v-if="editar"
-                @click="editarEstudiante()">{{ botonModal }}</button>
+                @click="editarEstudiante()"
+                :disabled='errors.any() || isComplete'>{{ botonModal }}</button>
               </div>
             </div>
           </div>
@@ -219,8 +232,33 @@ export default {
             total: 0,
             paginas: 0,
             orden: 'id',
-            ascDesc: false
+            ascDesc: false,
+            busqueda: ''
         }
+    },
+    computed: {
+	  isComplete () {
+	    
+	    let validado = true;
+	    
+	    if(this.nombres == ''){
+	    validado = false;
+	    }
+	    if(this.apellidos == ''){
+	    validado = false;
+	    }
+	    if(this.genero == ''){
+	    validado = false;
+	    }
+	    if(this.fechaDeNacimiento == ''){
+	    validado = false;
+	    }
+	    if(this.direccion == ''){
+	    validado = false;
+	    }
+	    
+	    return validado;
+	  }
     },
     methods: {
     	paginacion(pag, tipo, orderBy){
@@ -242,14 +280,14 @@ export default {
           this.estado = 'loading';
           this.orden = orderBy;
 
-    		axios.get(`/estudiante/${this.pagina}/${this.vista}/${orderBy}/${(this.ascDesc)? 'ASC' : 'DESC' }`)
+    		axios.get(`/estudiante/${this.pagina}/${this.vista}/${orderBy}/DESC`)
                 .then(respuesta => {
                     console.log(respuesta);
                     console.log(respuesta.data);
                     setTimeout(()=>{
                       this.estado = '';
                       this.estudiantes = respuesta.data;
-                    }, 5000);
+                    }, 2000);
                     this.contar();
                 })
                 .catch(error => {
@@ -350,6 +388,21 @@ export default {
                   .catch(error => {
                     alert(error);
                   })
+        },
+        buscar(){
+        	axios.get(`/estudiante/search/${this.busqueda}`)
+                .then(respuesta => {
+                    console.log(respuesta);
+                    console.log(respuesta.data);
+                    setTimeout(()=>{
+                      this.estado = '';
+                      this.estudiantes = respuesta.data;
+                      this.count = [];
+                    }, 2000);
+                })
+                .catch(error => {
+                	alert(error);
+                })
         }
     },
     created(){
@@ -370,6 +423,10 @@ export default {
   li{
       margin-bottom: .5em;
       list-style-type: none;
+  }
+  
+  th {
+  	cursor: pointer;
   }
 
   @keyframes loading {
