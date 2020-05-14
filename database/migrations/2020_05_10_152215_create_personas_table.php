@@ -21,7 +21,8 @@ class CreatePersonasTable extends Migration
             $table->date("fechaDeNacimiento");
             $table->unsignedBigInteger('id_direccion');
             $table->foreign("id_direccion")
-                  ->references('id')->on('direccions');
+                  ->references('id')->on('direccions')
+                  ->onDelete('cascade');
             $table->timestamps();
         });
     }

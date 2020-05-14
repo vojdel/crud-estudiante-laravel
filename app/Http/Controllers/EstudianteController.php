@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Estudiante;
 use App\Persona;
+use App\Direccion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Redirect;
@@ -27,8 +28,12 @@ class EstudianteController extends Controller
             $ordenBy = 'personas.'.$orden;
           }
 
-            $data = Estudiante::select('estudiantes.id', 'personas.nombres', 'personas.apellidos', 'personas.genero', 'personas.fechaDeNacimiento', 'personas.direccion')
+            $data = Estudiante::select('estudiantes.id', 'personas.nombres', 'personas.apellidos', 'personas.genero', 'personas.fechaDeNacimiento', 'personas.id_direccion','direccions.direccion', 'direccions.id_parroquia', 'parroquias.parroquia', 'parroquias.id_municipio', 'municipios.municipio', 'municipios.id_estado', 'estados.estado')
                 ->join('personas', 'estudiantes.id_persona', '=', 'personas.id')
+                ->join('direccions', 'personas.id_direccion', '=', 'direccions.id')
+                ->join('parroquias', 'direccions.id_parroquia', '=', 'parroquias.id')
+                ->join('municipios', 'parroquias.id_municipio', '=', 'municipios.id')
+                ->join('estados', 'municipios.id_estado', '=', 'estados.id')
                 ->orderBy($ordenBy, $tipo)
                 ->skip(($pag * $vista) - $vista)
                 ->take($vista)
@@ -40,7 +45,7 @@ class EstudianteController extends Controller
                 return $data;
         }
     }
-    
+
     /**
      * Display a listing of the resource.
      *
@@ -114,15 +119,21 @@ class EstudianteController extends Controller
             'apellidos' => 'required',
             'genero' => 'required',
             'fechaDeNacimiento' => 'required',
-            'direccion' => 'required'
+            'direccion' => 'required',
+            'id_parroquia' => 'required'
         ]);
+
+        $direccion = new Direccion();
+        $direccion->direccion = $request->direccion;
+        $direccion->id_parroquia = $request->id_parroquia;
+        $direccion->save();
 
         $persona = new Persona();
         $persona->nombres = $request->nombres;
         $persona->apellidos = $request->apellidos;
         $persona->genero = $request->genero;
         $persona->fechaDeNacimiento = $request->fechaDeNacimiento;
-        $persona->direccion = $request->direccion;
+        $persona->id_direccion = $direccion->id;
         $persona->save();
 
         $estudiante = new Estudiante();
@@ -179,15 +190,24 @@ class EstudianteController extends Controller
             'apellidos' => 'required',
             'genero' => 'required',
             'fechaDeNacimiento' => 'required',
-            'direccion' => 'required'
+            'id_direccion' => 'required',
+            'direccion' => 'required',
+            'id_parroquia' => 'required'
         ]);
 
+        $updateDireccion = [
+        	'direccion' => $request->direccion,
+          'id_parroquia' => $request->id_parroquia
+        ];
+
+        $direccion = Direccion::where('id', $request->id_direccion)->update($updateDireccion);
+
         $update = [
-        	'nombres' => $request->nombres,
-        	'apellidos' => $request->apellidos,
-        	'genero' => $request->genero,
-        	'fechaDeNacimiento' => $request->fechaDeNacimiento,
-        	'direccion' => $request->direccion
+          'nombres' => $request->nombres,
+          'apellidos' => $request->apellidos,
+          'genero' => $request->genero,
+          'fechaDeNacimiento' => $request->fechaDeNacimiento,
+          'id_direccion' => $request->id_direccion
         ];
 
         $persona = Persona::where('id', $id)->update($update);

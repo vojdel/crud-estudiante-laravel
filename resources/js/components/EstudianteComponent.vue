@@ -1,16 +1,19 @@
-cd<template>
+<template>
      <div>
          <div class="container pt-5 card">
             <div class="row">
-                <div class="col">
+                <div class="col-9">
                     <h2 class="card-title">Lista de Estudiantes:</h2>
                 </div>
-                <div class="col-10">
-                    <div class="form-group">
-                    	<input type="text" name="busqueda" class="form-control" 
-                    	@keyup.enter="buscar()"
-                    	v-model="busqueda" />
-                    </div>
+                <div class="col-1">
+                  <select name="vista" v-model="vista" @change="paginacion(pagina, 'normal', orden)">
+                    <option value="5" selected>5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">5</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                  </select>
                 </div>
                 <div class="col-2 pr-3">
                     <a href="#"
@@ -56,7 +59,7 @@ cd<template>
                               <td>{{estudiante.apellidos}}</td>
                               <td>{{estudiante.genero}}</td>
                               <td>{{estudiante.fechaDeNacimiento}}</td>
-                              <td>{{estudiante.direccion}}</td>
+                              <td>{{direccionCompleta(estudiante.estado, estudiante.municipio, estudiante.parroquia, estudiante.direccion)}}</td>
                               <td>
                                   <a href="#"
                                   class="btn btn-primary justify-content-center" data-toggle="modal" data-target="#exampleModal"
@@ -180,6 +183,27 @@ cd<template>
                   </div>
                   <div class="form-group">
                     <label for="direccion">Dirección: </label>
+                    <div class="form-group">
+                      <select name="estado" v-model="estudiante.idEstado" @change="obtenerMunicipio(estudiante.idEstado)">
+                        <option value="0">Seleccione...</option>
+                        <template v-for="est in estados">
+                          <option :value="est.id">{{est.estado}}</option>
+                        </template>
+                      </select>
+                    <select name="municipio"
+                    v-model="estudiante.idMunicipio"
+                    @change="obtenerParroquia(estudiante.idMunicipio)">
+                      <option value="0">Seleccione...</option>
+                      <template  v-for="municipio in municipios">
+                        <option :value="municipio.id">{{municipio.municipio}}</option>
+                      </template>
+                    </select>
+                    <select name="parroquia" v-model="estudiante.idParroquia">
+                      <template v-for="(parroquia, index) in parroquias">
+                        <option :value="parroquia.id">{{parroquia.parroquia}}</option>
+                      </template>
+                    </select>
+                    </div>
                     <textarea type="text" id="direccion" class="form-control" name="direccion" rows="2" cols="2"
                     v-model="estudiante.direccion"
                     v-validate="'required|max:150'"></textarea>
@@ -193,13 +217,13 @@ cd<template>
                 <button type="button" class="btn btn-primary" data-dismiss="modal"
                 v-if="!editar"
                 @click="agregarEstudiante()"
-                :disabled='errors.any() || isComplete'>
+                :disabled='errors.any() || !isComplete'>
                 	<span class="fa fa-save"></span> {{ botonModal }}
                 </button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal"
                 v-if="editar"
                 @click="editarEstudiante()"
-                :disabled='errors.any() || isComplete'>{{ botonModal }}</button>
+                :disabled='errors.any() || !isComplete'>{{ botonModal }}</button>
               </div>
             </div>
           </div>
@@ -220,8 +244,18 @@ export default {
                 apellidos: '',
                 genero: '',
                 fechaDeNacimiento: '',
-                direccion: ''
+                idDireccion: 0,
+                direccion: '',
+                idEstado: 0,
+                estado: '',
+                idMunicipio: 0,
+                municipio: '',
+                idParroquia: 0,
+                parroquia: ''
             },
+            estados: [],
+            municipios: [],
+            parroquias: [],
             editar: false,
             tituloModal: 'Registrar Estudiante',
             botonModal: 'Agregar',
@@ -237,28 +271,28 @@ export default {
         }
     },
     computed: {
-	  isComplete () {
-	    
-	    let validado = true;
-	    
-	    if(this.nombres == ''){
-	    validado = false;
-	    }
-	    if(this.apellidos == ''){
-	    validado = false;
-	    }
-	    if(this.genero == ''){
-	    validado = false;
-	    }
-	    if(this.fechaDeNacimiento == ''){
-	    validado = false;
-	    }
-	    if(this.direccion == ''){
-	    validado = false;
-	    }
-	    
-	    return validado;
-	  }
+  	  isComplete () {
+
+  	    let validado = true;
+
+  	    if(this.estudiante.nombres == ''){
+  	    validado = false;
+  	    }
+  	    if(this.estudiante.apellidos == ''){
+  	    validado = false;
+  	    }
+  	    if(this.estudiante.genero == ''){
+  	    validado = false;
+  	    }
+  	    if(this.estudiante.fechaDeNacimiento == ''){
+  	    validado = false;
+  	    }
+  	    if(this.estudiante.direccion == ''){
+  	    validado = false;
+  	    }
+
+  	    return validado;
+  	  }
     },
     methods: {
     	paginacion(pag, tipo, orderBy){
@@ -269,12 +303,6 @@ export default {
           this.pagina = pag+1;
         } else if (tipo == 'normal') {
           this.pagina = pag;
-        }
-
-        if(this.ascDesc == false){
-          this.ascDesc = true;
-        }else{
-          this.ascDesc = false;
         }
 
           this.estado = 'loading';
@@ -296,14 +324,15 @@ export default {
         },
         agregarEstudiante(){
 
-          //console.log(this.estudiante);
+          console.log(this.estudiante);
 
           let params = {
             nombres: this.estudiante.nombres,
             apellidos: this.estudiante.apellidos,
             genero: this.estudiante.genero,
             fechaDeNacimiento: this.estudiante.fechaDeNacimiento,
-            direccion: this.estudiante.direccion
+            direccion: this.estudiante.direccion,
+            id_parroquia: this.estudiante.idParroquia
           };
             axios({
             method: 'post',
@@ -329,6 +358,15 @@ export default {
           this.estudiante.apellidos = item.apellidos;
           this.estudiante.genero = item.genero;
           this.estudiante.fechaDeNacimiento = item.fechaDeNacimiento;
+
+          this.obtenerEstado();
+          this.estudiante.idEstado = item.id_estado;
+          this.obtenerMunicipio(item.id_estado);
+          this.estudiante.idMunicipio = item.id_municipio;
+          this.obtenerParroquia(item.id_municipio);
+          this.estudiante.idParroquia = item.id_parroquia;
+
+          this.estudiante.idDireccion = item.id_direccion;
           this.estudiante.direccion = item.direccion;
         },
         editarEstudiante(){
@@ -337,10 +375,12 @@ export default {
                     apellidos: this.estudiante.apellidos,
                     genero: this.estudiante.genero,
                     fechaDeNacimiento: this.estudiante.fechaDeNacimiento,
-                    direccion: this.estudiante.direccion
+                    id_direccion: this.estudiante.idDireccion,
+                    direccion: this.estudiante.direccion,
+                    id_parroquia: this.estudiante.idParroquia
                   };
 
-                  console.log(this.estudiante.id);
+                  console.log(this.estudiante);
           axios.put(`/estudiante/${this.estudiante.id}`, params)
             .then(respuesta => {
               console.log(respuesta);
@@ -370,11 +410,16 @@ export default {
           this.estudiante.genero = '';
           this.estudiante.fechaDeNacimiento = '';
           this.estudiante.direccion = '';
+          this.estudiante.idEstado = 0;
+          this.municipios = [];
+          this.parroquias = [];
           this.editar = false;
           setTimeout(()=>{
             this.tituloModal = 'Registrar Estudiante';
             this.botonModal = 'Registrar';
           }, 500);
+         // this.errors.clear();
+          this.$validator.reset()
         },
         contar(){
           axios.get(`/estudiante/contar`)
@@ -403,11 +448,48 @@ export default {
                 .catch(error => {
                 	alert(error);
                 })
-        }
+        },
+	  direccionCompleta(est, mun, par, dir) {
+	  	return est+", "+mun+", "+par+", "+dir
+	  },
+    obtenerEstado(){
+      axios.get(`/estado`)
+            .then(respuesta => {
+                console.log(respuesta);
+                console.log(respuesta.data);
+                  this.estados = respuesta.data;
+            })
+            .catch(error => {
+              alert(error);
+            })
+    },
+    obtenerMunicipio(id){
+      axios.get(`/municipio/estado/${id}`)
+            .then(respuesta => {
+                console.log(respuesta);
+                console.log(respuesta.data);
+                  this.municipios = respuesta.data;
+            })
+            .catch(error => {
+              alert(error);
+            })
+    },
+    obtenerParroquia(id){
+      axios.get(`/parroquia/municipio/${id}`)
+            .then(respuesta => {
+                console.log(respuesta);
+                console.log(respuesta.data);
+                  this.parroquias = respuesta.data;
+            })
+            .catch(error => {
+              alert(error);
+            })
+    }
     },
     created(){
         this.paginacion(this.pagina, 'normal', this.orden);
         //llamados.paginacion('/estudiante', estudiantes);
+        this.obtenerEstado();
     },
 }
 </script>
@@ -424,7 +506,7 @@ export default {
       margin-bottom: .5em;
       list-style-type: none;
   }
-  
+
   th {
   	cursor: pointer;
   }
