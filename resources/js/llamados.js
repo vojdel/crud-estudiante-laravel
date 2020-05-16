@@ -1,10 +1,11 @@
-import Vue from 'vue'
 import axios from 'axios'
 
-export const llamados = new Vue({
+export const llamados = {
 	methods: {
-			paginacion(data,pag, tipo, orderBy, estado){
-	
+			paginacion(url, data,pag, tipo, orderBy, estado){
+
+				let resultado = [];
+
 	        if(tipo == 'previo'){
 	          pag = pag-1;
 	        } else if (tipo == 'siguiente') {
@@ -12,22 +13,22 @@ export const llamados = new Vue({
 	        } else if (tipo == 'normal') {
 	          pag = pag;
 	        }
-	        
-	    		axios.get(`/estudiante/${pag}/${vista}/id/DESC`)
+
+	    		axios.get(`/${url}/${pag}/${vista}/${orderBy}/DESC`)
 	                .then(respuesta => {
 	                    console.log(respuesta);
 	                    console.log(respuesta.data);
 	                    setTimeout(()=>{
 	                      estado = '';
-	                      let datos = respuesta.data;
-	                      this.$emit('actualizarDatos', datos);
-	                      
+	                      let datos = respuesta.data
+
 	                    }, 5000);
-	                    this.contar();
 	                })
 	                .catch(error => {
-	                	alert(error);
+	                	console.error(error);
 	                })
+
+									return resultado;
         }
 	}
-});
+}

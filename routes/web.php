@@ -19,15 +19,31 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
-Route::resource("/estudiante", "EstudianteController")->except([
+Route::get('/estudiante*', function(){
+  return view('home');
+});
+
+Route::get('/parroquia', function(){
+  return view('home');
+});
+
+Route::get('/estado', function(){
+  return view('home');
+});
+
+Route::get('/municipio', function(){
+  return view('home');
+});
+
+Route::resource("/student", "EstudianteController")->except([
   'create', 'show', 'edit'
 ])->middleware('auth');
 
-Route::get("/estudiante/{pagina}/{vista}/{orden}/{tipo}", "EstudianteController@index");
+Route::get("/student/{pagina}/{vista}/{orden}/{tipo}", "EstudianteController@index");
 
-Route::get("/estudiante/contar", "EstudianteController@contar");
+Route::get("/student/contar", "EstudianteController@contar");
 
-Route::get("/estudiante/search/{buscar}/{pagina}/{vista}/{orden}/{tipo}", "EstudianteController@search");
+Route::get("/student/search/{buscar}/{pagina}/{vista}/{orden}/{tipo}", "EstudianteController@search");
 
 Route::resource("/estado", "EstadoController")->except([
   'create', 'show', 'edit'

@@ -2,6 +2,9 @@
 
 @section('content')
 
-    <estudiante-component></estudiante-component>
+  <app-component
+    :autenticacion="{{ Auth::user() }}"
+      >
+  </app-component>
 
 @endsection

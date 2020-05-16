@@ -11,12 +11,15 @@ es un mini crud con tabla relacionadas, con lo basico.
   1. PHP
 
  * FrameWorks:
-  1. Vue.js
+  1. Frontend
+    * Vue.js
     * Axios
     * vue-router
     * vee-validate
+    * Vuex
 
-  1. Laravel
+  1. Backend
+    * Laravel
 
  * Base de Datos:
   * Mysql

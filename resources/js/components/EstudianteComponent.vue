@@ -308,7 +308,7 @@ export default {
           this.estado = 'loading';
           this.orden = orderBy;
 
-    		axios.get(`/estudiante/${this.pagina}/${this.vista}/${orderBy}/DESC`)
+    		axios.get(`/student/${this.pagina}/${this.vista}/${orderBy}/DESC`)
                 .then(respuesta => {
                     console.log(respuesta);
                     console.log(respuesta.data);
@@ -336,7 +336,7 @@ export default {
           };
             axios({
             method: 'post',
-            url: '/estudiante',
+            url: '/student',
             data: params
             })
                   .then(respuesta =>{
@@ -381,7 +381,7 @@ export default {
                   };
 
                   console.log(this.estudiante);
-          axios.put(`/estudiante/${this.estudiante.id}`, params)
+          axios.put(`/student/${this.estudiante.id}`, params)
             .then(respuesta => {
               console.log(respuesta);
               this.limpiar();
@@ -394,7 +394,7 @@ export default {
         },
         eliminarEstudiante(id){
 
-          axios.delete(`/estudiante/${id}`)
+          axios.delete(`/student/${id}`)
             .then(respuesta => {
               console.log(respuesta);
               this.paginacion(this.pagina, 'normal', this.orden);
@@ -422,7 +422,7 @@ export default {
           this.$validator.reset()
         },
         contar(){
-          axios.get(`/estudiante/contar`)
+          axios.get(`/student/contar`)
                   .then(respuesta => {
                     this.count = [];
                       for (var i = 0; i < (respuesta.data / this.vista); i++) {
@@ -435,7 +435,7 @@ export default {
                   })
         },
         buscar(){
-        	axios.get(`/estudiante/search/${this.busqueda}`)
+        	axios.get(`/student/search/${this.busqueda}`)
                 .then(respuesta => {
                     console.log(respuesta);
                     console.log(respuesta.data);
@@ -488,7 +488,7 @@ export default {
     },
     created(){
         this.paginacion(this.pagina, 'normal', this.orden);
-        //llamados.paginacion('/estudiante', estudiantes);
+        //llamados.paginacion('/student', estudiantes);
         this.obtenerEstado();
     },
 }
